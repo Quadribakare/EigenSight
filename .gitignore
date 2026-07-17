@@ -1,0 +1,15 @@
+.venv/
+venv/
+node_modules/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+*.zip
+*.npy
+*.h5
+*.pkl
+*.pt
+sourcePar*/
+eigen-correlation-explorer/eigen-correlation/venv/Lib/site-packages/playwright/driver/node.exe
