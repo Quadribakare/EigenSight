@@ -26,12 +26,18 @@ def generate_analysis(
 
     trend_line = ""
     if trend_stats:
-        trend_desc = ", ".join(
-            f"{t}: {pct:+.1f}%" for t, pct in sorted(
-                trend_stats.items(), key=lambda kv: kv[1], reverse=True
+        # A ticker with a price gap at the start/end of the window produces
+        # NaN here, which _sanitize() (http_utils.py) turns into None before
+        # it crosses the JSON boundary — drop those rather than let sorted()
+        # crash trying to compare None with a float.
+        valid_stats = {t: pct for t, pct in trend_stats.items() if pct is not None}
+        if valid_stats:
+            trend_desc = ", ".join(
+                f"{t}: {pct:+.1f}%" for t, pct in sorted(
+                    valid_stats.items(), key=lambda kv: kv[1], reverse=True
+                )
             )
-        )
-        trend_line = f"\nPrice trend over the analysis window (% change): {trend_desc}"
+            trend_line = f"\nPrice trend over the analysis window (% change): {trend_desc}"
 
     prompt = f"""A trader wants two direct questions answered about {target_ticker} ({sector}):
 
