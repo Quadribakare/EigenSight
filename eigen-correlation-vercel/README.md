@@ -57,6 +57,34 @@ same visuals, same analysis pipeline, same AI layer.
 - `requirements.txt` at the repo root installs the Python function
   dependencies (pandas, numpy, yfinance, requests, python-dotenv).
 
+```mermaid
+flowchart LR
+    subgraph Browser
+        FE["Next.js frontend\napp/, components/"]
+    end
+    subgraph Vercel["Vercel serverless functions (api/)"]
+        S["sectors.py"]
+        P["peers.py"]
+        A["analyze.py"]
+        E["explain.py"]
+        Core["api/_core/\nai_discovery, data_fetcher, pca_engine, ai_analyst"]
+        S --> Core
+        P --> Core
+        A --> Core
+        E --> Core
+    end
+    OR[(OpenRouter)]
+    YF[(yfinance / Yahoo)]
+
+    FE -->|1. ticker| S --> OR
+    FE -->|2. sector choice| P --> OR
+    P --> YF
+    FE -->|3. peer count| A --> YF
+    FE -->|4. render table| E --> OR
+```
+
+Each API route is a stateless function call — the frontend drives the sequence (sector choice → peer count → analyze → explain), re-fetching fresh state from each endpoint rather than the backend holding session state between calls.
+
 ## Local development
 
 ```bash
